@@ -1,3 +1,5 @@
+const form = document.querySelector('.book-form');
+
 // Mobile menu
 const menuBtn = document.querySelector('.menu-btn');
 const nav = document.getElementById('nav');
@@ -40,6 +42,16 @@ document.querySelector('.grid').addEventListener('click', e => {
   const btn = e.target.closest('button');
   if (btn) { show(btn); box.showModal(); }
 });
+box.querySelector('.book-this').addEventListener('click', () => {
+  const style = current.dataset.style;
+  current = null;
+  box.close();
+  const radio = [...form.elements.style].find(r => r.value === style);
+  radio.checked = true;
+  radio.dispatchEvent(new Event('change', { bubbles: true }));
+  document.getElementById('book').scrollIntoView();
+  form.elements.name.focus({ preventScroll: true });
+});
 box.querySelector('.box-close').addEventListener('click', () => box.close());
 box.querySelector('.prev').addEventListener('click', () => step(-1));
 box.querySelector('.next').addEventListener('click', () => step(1));
@@ -64,29 +76,70 @@ if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
   clips.forEach(v => io.observe(v));
 }
 
-// Booking form: stay on the page when JS is available, otherwise thanks.html handles it
-const form = document.querySelector('.book-form');
-const status = form.querySelector('.form-status');
-const dateInput = form.querySelector('[type=date]');
-const d = new Date();
-dateInput.min = new Date(d - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+// Booking form: stays on the page with JS, falls back to thanks.html without it
+const statusLine = form.querySelector('.form-status');
+const done = document.querySelector('.book-done');
+const dateInput = form.elements['preferred-date'];
+const now = new Date();
+dateInput.min = new Date(now - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+form.noValidate = true;
+
+const fieldValid = field => [...field.querySelectorAll('[required]')].every(c => c.checkValidity());
+const markField = (field, ok) => {
+  field.classList.toggle('bad', !ok);
+  field.querySelector('.err').textContent = ok ? '' : field.dataset.error;
+  field.querySelectorAll('input').forEach(c => c.setAttribute('aria-invalid', !ok));
+};
+const clearIfFixed = e => {
+  const field = e.target.closest('.field.bad');
+  if (field && fieldValid(field)) markField(field, true);
+};
+form.addEventListener('input', clearIfFixed);
+form.addEventListener('change', clearIfFixed);
+
 form.addEventListener('submit', async e => {
   e.preventDefault();
-  const btn = form.querySelector('button');
+  const fields = [...form.querySelectorAll('.field[data-error]')];
+  fields.forEach(f => markField(f, fieldValid(f)));
+  const firstBad = fields.find(f => !fieldValid(f));
+  if (firstBad) {
+    firstBad.querySelector('input').focus();
+    return;
+  }
+  const btn = form.querySelector('[type=submit]');
+  const data = new FormData(form);
   btn.disabled = true;
-  status.textContent = 'Sending...';
+  btn.textContent = 'Sending...';
+  statusLine.textContent = '';
   try {
     const res = await fetch('/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(new FormData(form)).toString(),
+      body: new URLSearchParams(data).toString(),
     });
     if (!res.ok) throw new Error(res.status);
-    form.reset();
-    status.textContent = 'Request sent. Javel will contact you to confirm.';
+    const date = new Date(`${data.get('preferred-date')}T12:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    done.querySelector('h3').textContent = `Thanks, ${data.get('name').trim().split(/\s+/)[0]}. Your request is in.`;
+    done.querySelector('.done-summary').textContent = `${data.get('style')}, ${date}`;
+    done.querySelector('.done-contact').textContent = data.get('contact');
+    form.hidden = true;
+    done.hidden = false;
+    done.focus();
   } catch {
-    status.textContent = "That didn't send. Please try again, or DM @javelthehairbelle on Instagram.";
+    statusLine.textContent = "That didn't go through. Please try again, or DM @javelthehairbelle on Instagram.";
   } finally {
     btn.disabled = false;
+    btn.textContent = 'Send request';
   }
 });
+done.querySelector('button').addEventListener('click', () => {
+  form.reset();
+  done.hidden = true;
+  form.hidden = false;
+  form.elements.name.focus();
+});
+
+// The sticky button steps aside once the booking section is on screen
+const sticky = document.querySelector('.sticky-book');
+new IntersectionObserver(([e]) => sticky.classList.toggle('away', e.isIntersecting))
+  .observe(document.getElementById('book'));

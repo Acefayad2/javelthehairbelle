@@ -50,6 +50,17 @@ CLIPS = [
 ]
 
 
+def style_for(caption):
+    """Which booking option a gallery photo preselects, based on its caption."""
+    c = caption.lower()
+    for key, style in (("highlighted", "Highlighted boho braids"), ("boho", "Boho braids"), ("this color", "Boho braids"),
+                       ("fulani", "Fulani braids"), ("wig", "Wig install"), ("two strand", "Two strand retwist"),
+                       ("winters", "Twists")):
+        if key in c:
+            return style
+    return "Retwist"
+
+
 # Every option comes from a caption or hashtag on her posts.
 STYLES = ["Retwist", "Two strand retwist", "Twists", "Boho braids", "Highlighted boho braids",
           "Fulani braids", "Wig install", "Half wig install", "Something else"]
@@ -67,7 +78,7 @@ def gallery_html():
         out.append(
             f'<figure class="shot" data-group="{group}">'
             f'<button type="button" data-index="{i}" data-full="assets/photos/{pid}-lg.webp" '
-            f'data-post="{post_url(pid)}" data-caption="{escape(cap, quote=True)}" aria-label="Open photo: {escape(alt, quote=True)}">'
+            f'data-post="{post_url(pid)}" data-caption="{escape(cap, quote=True)}" data-style="{style_for(cap)}" aria-label="Open photo: {escape(alt, quote=True)}">'
             f'<img src="assets/photos/{pid}.webp" alt="{escape(alt, quote=True)}" width="{w}" height="{h}" loading="lazy" decoding="async">'
             f"</button></figure>"
         )
@@ -75,7 +86,9 @@ def gallery_html():
 
 
 def style_options():
-    return "\n            ".join(f"<option>{s}</option>" for s in STYLES)
+    return "\n            ".join(
+        f'<label class="chip"><input type="radio" name="style" value="{s}" required><span>{s}</span></label>' for s in STYLES
+    )
 
 
 def clips_html():
@@ -207,27 +220,41 @@ PAGE = f"""<!doctype html>
       <form name="booking" method="POST" action="/thanks.html" data-netlify="true" netlify-honeypot="company" class="book-form">
         <input type="hidden" name="form-name" value="booking">
         <p class="hp"><label>Leave this empty <input name="company" tabindex="-1" autocomplete="off"></label></p>
-        <label>Your name
-          <input name="name" required autocomplete="name">
-        </label>
-        <label>Instagram or phone number
-          <input name="contact" required autocomplete="off">
-        </label>
-        <label>Style
-          <select name="style" required>
-            <option value="">Choose a style</option>
+        <fieldset class="full field" data-error="Choose a style to continue.">
+          <legend>What would you like?</legend>
+          <div class="chips">
             {style_options()}
-          </select>
-        </label>
-        <label>Preferred date
-          <input type="date" name="preferred-date" required>
-        </label>
-        <label class="full">Anything else Javel should know? (optional)
-          <textarea name="notes" rows="3"></textarea>
-        </label>
+          </div>
+          <small class="err"></small>
+        </fieldset>
+        <div class="field" data-error="Enter your name.">
+          <label for="f-name">Your name</label>
+          <input id="f-name" name="name" required autocomplete="name">
+          <small class="err"></small>
+        </div>
+        <div class="field" data-error="Enter your Instagram or phone number so Javel can reach you.">
+          <label for="f-contact">Instagram or phone number</label>
+          <input id="f-contact" name="contact" required autocomplete="off">
+          <small class="err"></small>
+        </div>
+        <div class="field" data-error="Choose today or a later date.">
+          <label for="f-date">Preferred date</label>
+          <input id="f-date" type="date" name="preferred-date" required>
+          <small class="err"></small>
+        </div>
+        <div class="field">
+          <label for="f-notes">Notes (optional)</label>
+          <input id="f-notes" name="notes" autocomplete="off">
+        </div>
         <button class="btn full" type="submit">Send request</button>
         <p class="form-status full" role="status" aria-live="polite"></p>
       </form>
+      <div class="book-done" hidden tabindex="-1">
+        <h3></h3>
+        <p class="done-summary"></p>
+        <p>Javel will contact you at <strong class="done-contact"></strong> to confirm. Your appointment isn't set until she does.</p>
+        <button class="btn btn-ghost" type="button">Send another request</button>
+      </div>
       <p class="alt">Prefer Instagram? <a href="{DM}" target="_blank" rel="noopener">DM @javelthehairbelle</a> or, if that's not working, <a href="{DM_ALT}" target="_blank" rel="noopener">@javelxo</a></p>
     </div>
   </section>
@@ -245,7 +272,7 @@ PAGE = f"""<!doctype html>
   <button class="box-nav prev" type="button" aria-label="Previous photo">{icon("caret-left")}</button>
   <figure>
     <img alt="">
-    <figcaption><span></span><a target="_blank" rel="noopener">View post {icon("arrow-right")}</a></figcaption>
+    <figcaption><span></span><a target="_blank" rel="noopener">View post {icon("arrow-right")}</a><button class="book-this" type="button">Book this style</button></figcaption>
   </figure>
   <button class="box-nav next" type="button" aria-label="Next photo">{icon("caret-right")}</button>
 </dialog>
