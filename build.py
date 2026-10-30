@@ -93,8 +93,8 @@ PAGE = f"""<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Javel The Hair Belle | Hairstylist in Silver Spring, MD</title>
 <meta name="description" content="Retwists, braids and wig installs by Javel, a teen beginner stylist based in Silver Spring, MD. See her work and book on Instagram.">
-<meta name="theme-color" content="#fff9fb" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#171215" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#ffffff">
 <meta property="og:title" content="Javel The Hair Belle">
 <meta property="og:description" content="Retwists, braids and wig installs in Silver Spring, MD. Book on Instagram.">
 <meta property="og:type" content="website">
