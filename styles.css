@@ -209,20 +209,28 @@ h2 { font-size: clamp(2.2rem, 5vw, 3.4rem); }
   .box img { max-height: calc(100dvh - 210px); }
 }
 
-/* Intro: a chrome comb runs down the logo, turning the tangled copy into the clean one. */
+/* Intro: a chrome comb runs down the logo, turning the tangled copy into the clean one.
+   Then a full-size comb brushes down the screen, and the intro is cleared right at its teeth. */
+:root { --sweep: 1.25s; --sweep-ease: cubic-bezier(.55, 0, .2, 1); --sweep-comb: clamp(140px, 24vh, 230px); }
+.page-sweep { display: none; }
+.play-intro .page-sweep { display: block; position: fixed; inset: 0; z-index: 41; overflow: hidden; pointer-events: none; }
+.sweep-track { position: absolute; inset: 0; animation: sweep-down var(--sweep) var(--sweep-ease) 2s forwards; }
+.sweep-comb { position: absolute; left: -2%; width: 104%; height: var(--sweep-comb); bottom: 100%; filter: drop-shadow(0 14px 18px rgb(120 40 80 / .35)); }
+.sweep-trail { position: absolute; left: -2%; width: 104%; height: 55vh; bottom: calc(100% + var(--sweep-comb) - 30px); background: repeating-linear-gradient(90deg, rgb(226 110 165 / .75) 0 3px, rgb(255 255 255 / .55) 3px 6px, transparent 6px 27px); -webkit-mask-image: linear-gradient(transparent, #000); mask-image: linear-gradient(transparent, #000); }
+@keyframes sweep-down { to { transform: translateY(calc(100% + var(--sweep-comb) + 55vh)); } }
 .intro { display: none; }
-.play-intro .intro { display: grid; place-items: center; position: fixed; inset: 0; z-index: 40; background: var(--blend), #fff; animation: intro-out .6s var(--ease) 2.25s forwards; cursor: pointer; }
+.play-intro .intro { display: grid; place-items: center; position: fixed; inset: 0; z-index: 40; background: var(--blend), #fff; animation: intro-out var(--sweep) var(--sweep-ease) 2s forwards; cursor: pointer; }
 .intro-stage { position: relative; width: min(78vw, 560px); aspect-ratio: 745 / 340; animation: intro-pop .5s var(--ease) both; }
 .intro-stage img { position: absolute; inset: 0; width: 100%; height: 100%; }
 .intro-tangled { filter: url(#tangle); opacity: .75; animation: intro-hide .3s linear 1.45s forwards; }
 .intro-clean { clip-path: inset(0 0 100% 0); animation: intro-reveal 1.15s cubic-bezier(.45, 0, .3, 1) .4s forwards; }
 .intro-track { position: absolute; inset: 0; animation: intro-comb 1.15s cubic-bezier(.45, 0, .3, 1) .4s forwards, intro-hide .25s linear 1.5s forwards; pointer-events: none; }
 .comb { position: absolute; left: -7%; width: 114%; bottom: 100%; height: auto; filter: drop-shadow(0 8px 12px rgb(120 40 80 / .28)); }
-.intro-shine { position: absolute; inset: 0; background: linear-gradient(105deg, transparent 38%, rgb(255 255 255 / .85) 50%, transparent 62%); background-size: 260% 100%; background-position: 130% 0; opacity: 0; animation: intro-shine .6s ease-out 1.55s forwards; pointer-events: none; }
+.intro-shine { position: absolute; inset: 0; background: linear-gradient(105deg, transparent 38%, rgb(255 255 255 / .85) 50%, transparent 62%); background-size: 260% 100%; background-position: 130% 0; opacity: 0; animation: intro-shine .5s ease-out 1.5s forwards; pointer-events: none; }
 .intro-skip { position: absolute; bottom: calc(24px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); min-height: 44px; padding: 0 18px; border: 0; border-radius: 999px; background: rgb(255 255 255 / .75); color: var(--text); font: 500 .94rem Figtree, sans-serif; cursor: pointer; }
 @keyframes intro-pop { from { opacity: 0; transform: scale(.96); } }
 @keyframes intro-reveal { to { clip-path: inset(0 0 0 0); } }
 @keyframes intro-comb { 0% { transform: translateY(-4%); } 100% { transform: translateY(100%); } }
 @keyframes intro-hide { to { opacity: 0; } }
 @keyframes intro-shine { 0% { opacity: 1; background-position: 130% 0; } 100% { opacity: 1; background-position: -30% 0; } }
-@keyframes intro-out { to { opacity: 0; visibility: hidden; } }
+@keyframes intro-out { from { clip-path: inset(0 0 0 0); } to { clip-path: inset(calc(100% + var(--sweep-comb) + 55vh) 0 0 0); visibility: hidden; } }

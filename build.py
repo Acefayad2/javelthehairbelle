@@ -85,13 +85,13 @@ def gallery_html():
     return "\n        ".join(out)
 
 
-def comb_svg():
+def comb_svg(grad="chrome", cls="comb", stretch=""):
     teeth = "".join(f'<rect x="{14 + i * 16}" y="34" width="8" height="150" rx="4"/>' for i in range(39))
     return (
-        '<svg class="comb" viewBox="0 0 640 190" aria-hidden="true"><defs><linearGradient id="chrome" x1="0" y1="0" x2="1" y2=".25">'
+        f'<svg class="{cls}" viewBox="0 0 640 190" {stretch} aria-hidden="true"><defs><linearGradient id="{grad}" x1="0" y1="0" x2="1" y2=".25">'
         '<stop offset="0" stop-color="#6f737c"/><stop offset=".3" stop-color="#eef0f3"/><stop offset=".52" stop-color="#8e929b"/>'
         '<stop offset=".75" stop-color="#f7f8fa"/><stop offset="1" stop-color="#6f737c"/></linearGradient></defs>'
-        f'<g fill="url(#chrome)">{teeth}<rect width="640" height="52" rx="24"/></g>'
+        f'<g fill="url(#{grad})">{teeth}<rect width="640" height="52" rx="24"/></g>'
         '<rect x="20" y="20" width="600" height="6" rx="3" fill="#e58db5"/></svg>'
     )
 
@@ -152,6 +152,8 @@ PAGE = f"""<!doctype html>
   </div>
   <button class="intro-skip" type="button">Skip intro</button>
 </div>
+
+<div class="page-sweep"><div class="sweep-track"><span class="sweep-trail"></span>{comb_svg("chrome-big", "sweep-comb", 'preserveAspectRatio="none"')}</div></div>
 
 <a class="skip" href="#main">Skip to content</a>
 
