@@ -85,6 +85,17 @@ def gallery_html():
     return "\n        ".join(out)
 
 
+def comb_svg():
+    teeth = "".join(f'<rect x="{14 + i * 16}" y="34" width="8" height="150" rx="4"/>' for i in range(39))
+    return (
+        '<svg class="comb" viewBox="0 0 640 190" aria-hidden="true"><defs><linearGradient id="chrome" x1="0" y1="0" x2="1" y2=".25">'
+        '<stop offset="0" stop-color="#6f737c"/><stop offset=".3" stop-color="#eef0f3"/><stop offset=".52" stop-color="#8e929b"/>'
+        '<stop offset=".75" stop-color="#f7f8fa"/><stop offset="1" stop-color="#6f737c"/></linearGradient></defs>'
+        f'<g fill="url(#chrome)">{teeth}<rect width="640" height="52" rx="24"/></g>'
+        '<rect x="20" y="20" width="600" height="6" rx="3" fill="#e58db5"/></svg>'
+    )
+
+
 def style_options():
     return "\n            ".join(
         f'<label class="chip"><input type="radio" name="style" value="{s}" required><span>{s}</span></label>' for s in STYLES
@@ -125,10 +136,23 @@ PAGE = f"""<!doctype html>
 <link rel="apple-touch-icon" href="assets/brand/icon-180.png">
 <link rel="preload" href="assets/fonts/BodoniModa-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/photos/De4iuTrFjDi_i0-lg.webp" as="image">
+<link rel="preload" href="assets/brand/logo-intro.webp" as="image">
 <link rel="stylesheet" href="styles.css">
+<script>try{{if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&!sessionStorage.getItem('intro-seen'))document.documentElement.classList.add('play-intro')}}catch(e){{}}</script>
 <script type="application/ld+json">{SCHEMA}</script>
 </head>
 <body>
+<div class="intro">
+  <svg width="0" height="0" aria-hidden="true"><filter id="tangle"><feTurbulence type="fractalNoise" baseFrequency=".018 .05" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="34" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
+  <div class="intro-stage">
+    <img class="intro-tangled" src="assets/brand/logo-intro.webp" alt="" width="745" height="340">
+    <img class="intro-clean" src="assets/brand/logo-intro.webp" alt="Javel The Hair Belle" width="745" height="340">
+    <span class="intro-shine"></span>
+    <div class="intro-track">{comb_svg()}</div>
+  </div>
+  <button class="intro-skip" type="button">Skip intro</button>
+</div>
+
 <a class="skip" href="#main">Skip to content</a>
 
 <header class="top">
