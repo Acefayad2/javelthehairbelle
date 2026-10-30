@@ -50,6 +50,11 @@ CLIPS = [
 ]
 
 
+# Every option comes from a caption or hashtag on her posts.
+STYLES = ["Retwist", "Two strand retwist", "Twists", "Boho braids", "Highlighted boho braids",
+          "Fulani braids", "Wig install", "Half wig install", "Something else"]
+
+
 def post_url(pid):
     sc = pid.rsplit("_", 1)[0]
     return f"https://www.instagram.com/{'reel' if sc in REELS else 'p'}/{sc}/"
@@ -67,6 +72,10 @@ def gallery_html():
             f"</button></figure>"
         )
     return "\n        ".join(out)
+
+
+def style_options():
+    return "\n            ".join(f"<option>{s}</option>" for s in STYLES)
 
 
 def clips_html():
@@ -92,11 +101,11 @@ PAGE = f"""<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Javel The Hair Belle | Hairstylist in Silver Spring, MD</title>
-<meta name="description" content="Retwists, braids and wig installs by Javel, a teen beginner stylist based in Silver Spring, MD. See her work and book on Instagram.">
+<meta name="description" content="Retwists, braids and wig installs by Javel, a teen beginner stylist based in Silver Spring, MD. See her work and request an appointment.">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#ffffff">
 <meta property="og:title" content="Javel The Hair Belle">
-<meta property="og:description" content="Retwists, braids and wig installs in Silver Spring, MD. Book on Instagram.">
+<meta property="og:description" content="Retwists, braids and wig installs in Silver Spring, MD. Request an appointment online.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://javelthehairbelle.netlify.app/assets/clips/De4iuTrFjDi_v0.jpg">
 <link rel="icon" href="assets/brand/icon-180.png">
@@ -128,7 +137,7 @@ PAGE = f"""<!doctype html>
       <h1>Retwists, braids and <em>wig installs</em></h1>
       <p>Styled by Javel, a teen beginner stylist based in Silver Spring, MD.</p>
       <div class="actions">
-        <a class="btn" href="{DM}" target="_blank" rel="noopener">{icon("instagram-logo")}Book on Instagram</a>
+        <a class="btn" href="#book">Book now</a>
         <a class="btn btn-ghost" href="#work">See the work</a>
       </div>
     </div>
@@ -141,7 +150,7 @@ PAGE = f"""<!doctype html>
 
   <section class="styles wrap" id="styles">
     <h2>Styles on her page</h2>
-    <p class="lede">Everything here comes from Javel's own posts. Prices and availability aren't posted, so ask in your DM.</p>
+    <p class="lede">Everything here comes from Javel's own posts. Prices and availability aren't posted, so ask when you book.</p>
     <div class="bento">
       <a class="tile t1" href="#work" data-filter="locs">
         <img src="assets/photos/DeUgit7ljA8_i1-lg.webp" alt="" loading="lazy" width="720" height="960">
@@ -193,10 +202,33 @@ PAGE = f"""<!doctype html>
   <section class="book" id="book">
     <div class="wrap">
       <img class="book-logo" src="assets/brand/logo.png" alt="" width="149" height="68">
-      <h2>Ready for your next style?</h2>
-      <p>Booking happens over Instagram. Send Javel a DM and ask about the style you want.</p>
-      <a class="btn" href="{DM}" target="_blank" rel="noopener">{icon("instagram-logo")}Book on Instagram</a>
-      <p class="alt">DM not working? <a href="{DM_ALT}" target="_blank" rel="noopener">Message @javelxo</a></p>
+      <h2>Book your style</h2>
+      <p>Send a request and Javel will contact you to confirm. Your appointment isn't set until she does.</p>
+      <form name="booking" method="POST" action="/thanks.html" data-netlify="true" netlify-honeypot="company" class="book-form">
+        <input type="hidden" name="form-name" value="booking">
+        <p class="hp"><label>Leave this empty <input name="company" tabindex="-1" autocomplete="off"></label></p>
+        <label>Your name
+          <input name="name" required autocomplete="name">
+        </label>
+        <label>Instagram or phone number
+          <input name="contact" required autocomplete="off">
+        </label>
+        <label>Style
+          <select name="style" required>
+            <option value="">Choose a style</option>
+            {style_options()}
+          </select>
+        </label>
+        <label>Preferred date
+          <input type="date" name="preferred-date" required>
+        </label>
+        <label class="full">Anything else Javel should know? (optional)
+          <textarea name="notes" rows="3"></textarea>
+        </label>
+        <button class="btn full" type="submit">Send request</button>
+        <p class="form-status full" role="status" aria-live="polite"></p>
+      </form>
+      <p class="alt">Prefer Instagram? <a href="{DM}" target="_blank" rel="noopener">DM @javelthehairbelle</a> or, if that's not working, <a href="{DM_ALT}" target="_blank" rel="noopener">@javelxo</a></p>
     </div>
   </section>
 </main>
@@ -206,7 +238,7 @@ PAGE = f"""<!doctype html>
   <a href="{IG}" target="_blank" rel="noopener">{icon("instagram-logo")}@javelthehairbelle</a>
 </footer>
 
-<a class="sticky-book" href="{DM}" target="_blank" rel="noopener">{icon("instagram-logo")}Book on Instagram</a>
+<a class="sticky-book" href="#book">Book now</a>
 
 <dialog class="box" aria-label="Photo viewer">
   <button class="box-close" type="button" aria-label="Close">{icon("x")}</button>

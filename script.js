@@ -63,3 +63,30 @@ if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
   }, { threshold: .4 });
   clips.forEach(v => io.observe(v));
 }
+
+// Booking form: stay on the page when JS is available, otherwise thanks.html handles it
+const form = document.querySelector('.book-form');
+const status = form.querySelector('.form-status');
+const dateInput = form.querySelector('[type=date]');
+const d = new Date();
+dateInput.min = new Date(d - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = form.querySelector('button');
+  btn.disabled = true;
+  status.textContent = 'Sending...';
+  try {
+    const res = await fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(new FormData(form)).toString(),
+    });
+    if (!res.ok) throw new Error(res.status);
+    form.reset();
+    status.textContent = 'Request sent. Javel will contact you to confirm.';
+  } catch {
+    status.textContent = "That didn't send. Please try again, or DM @javelthehairbelle on Instagram.";
+  } finally {
+    btn.disabled = false;
+  }
+});

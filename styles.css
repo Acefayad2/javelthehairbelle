@@ -171,3 +171,19 @@ h2 { font-size: clamp(2.2rem, 5vw, 3.4rem); }
   .box .prev { grid-column: 1; }
   .box .next { grid-column: 2; }
 }
+
+.book-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 620px; margin: 0 auto; text-align: left; }
+.book-form label { display: grid; gap: 6px; font-weight: 600; font-size: .96rem; }
+.book-form input, .book-form select, .book-form textarea { width: 100%; min-height: 50px; padding: 12px 14px; border: 1.5px solid #c98aa8; border-radius: var(--radius); background: #fff; color: var(--text); font: 400 16px/1.4 Figtree, sans-serif; }
+.book-form textarea { resize: vertical; }
+.book-form .full { grid-column: 1 / -1; }
+.book-form button { border: 0; cursor: pointer; font: 600 1rem Figtree, sans-serif; }
+.book-form button:disabled { opacity: .7; cursor: wait; }
+.book-form .hp { position: absolute; left: -9999px; }
+.book .form-status { margin: 0; max-width: none; text-align: center; font-weight: 600; color: var(--text); }
+.book .form-status:empty { display: none; }
+.thanks { display: grid; place-content: center; justify-items: center; gap: 16px; min-height: 100dvh; padding: 24px; text-align: center; }
+.thanks p { color: var(--muted); max-width: 40ch; margin: 0; }
+@media (max-width: 767px) {
+  .book-form { grid-template-columns: 1fr; }
+}
