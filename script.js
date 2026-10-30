@@ -1,8 +1,7 @@
-// Intro plays once per visit. CSS ends it by itself, so this only handles skipping and cleanup.
+// Intro plays on every page load. CSS ends it by itself, so this only handles skipping and cleanup.
 const intro = document.querySelector('.intro');
 const endIntro = () => document.documentElement.classList.remove('play-intro');
 if (document.documentElement.classList.contains('play-intro')) {
-  try { sessionStorage.setItem('intro-seen', '1'); } catch {}
   intro.addEventListener('click', endIntro);
   intro.addEventListener('animationend', e => { if (e.target === intro) endIntro(); });
 }

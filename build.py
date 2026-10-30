@@ -138,7 +138,7 @@ PAGE = f"""<!doctype html>
 <link rel="preload" href="assets/photos/De4iuTrFjDi_i0-lg.webp" as="image">
 <link rel="preload" href="assets/brand/logo-intro.webp" as="image">
 <link rel="stylesheet" href="styles.css">
-<script>try{{if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&!sessionStorage.getItem('intro-seen'))document.documentElement.classList.add('play-intro')}}catch(e){{}}</script>
+<script>try{{if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('play-intro')}}catch(e){{}}</script>
 <script type="application/ld+json">{SCHEMA}</script>
 </head>
 <body>
